@@ -1,5 +1,5 @@
 import type { Completion, Task } from '../types'
-import { isCheckedOff, isDue } from './frequency'
+import { isCheckedOff, isRecurring } from './frequency'
 
 export function isSameDay(iso: string, now = new Date()): boolean {
   const d = new Date(iso)
@@ -32,9 +32,14 @@ export function weekCounts(
   return out
 }
 
-/** Tasks relevant to "Today": currently due, or already completed today. */
+/** Tasks for "Today": recurring tasks not yet done this period (show until done),
+ *  plus anything completed today (so it can be unchecked). Manual frequencies
+ *  (As needed / Ongoing / Seasonal) never appear here. */
 export function todaysTasks(tasks: Task[], completions: Completion[], now = new Date()): Task[] {
-  return tasks.filter((t) => isDue(t, now) || completedToday(t.id, completions, now))
+  return tasks.filter(
+    (t) =>
+      (isRecurring(t.frequency) && !isCheckedOff(t, now)) || completedToday(t.id, completions, now),
+  )
 }
 
 /** done / total for the Today progress ring over a set of tasks. */

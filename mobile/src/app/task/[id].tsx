@@ -7,7 +7,7 @@ import { Card } from '@/components/Card'
 import { Avatar } from '@/components/Avatar'
 import { Icon } from '@/components/Icon'
 import { color, font, radius, personColors } from '@/theme/tokens'
-import { dueLabel, nextDue } from '@/lib/frequency'
+import { isRecurring, nextResetLabel } from '@/lib/frequency'
 
 function relative(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -37,7 +37,6 @@ export default function TaskDetail() {
     .filter((c) => c.taskId === task.id)
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, 5)
-  const due = nextDue(task)
   const ownerChipColors =
     task.owner === 'Both' ? { soft: color.surfaceAlt, deep: color.ink } : personColors(task.owner)
 
@@ -65,7 +64,10 @@ export default function TaskDetail() {
           <Card style={{ gap: 0, paddingVertical: 4 }}>
             <Row label="Repeats" value={task.frequency} />
             <Divider />
-            <Row label="Next due" value={due ? dueLabel(task) : '—'} />
+            <Row
+              label={isRecurring(task.frequency) ? 'Next reset' : 'Next due'}
+              value={isRecurring(task.frequency) ? nextResetLabel(task) : '—'}
+            />
             <Divider />
             <Row
               label="Reminder"

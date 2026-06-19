@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native'
 import type { Task } from '../types'
 import { color, radius, shadow } from '../theme/tokens'
-import { dueLabel, isCheckedOff, isDue } from '../lib/frequency'
+import { isCheckedOff } from '../lib/frequency'
 import { Txt } from './Txt'
 import { Avatar } from './Avatar'
 import { Checkbox } from './Checkbox'
@@ -14,7 +14,6 @@ interface Props {
 
 export function TaskCard({ task, onPress, onToggle }: Props) {
   const checked = isCheckedOff(task)
-  const due = isDue(task) && !checked
   return (
     <Pressable onPress={onPress} style={styles.card}>
       <Checkbox checked={checked} owner={task.owner} onToggle={onToggle} />
@@ -40,11 +39,6 @@ export function TaskCard({ task, onPress, onToggle }: Props) {
           </View>
         ) : null}
       </View>
-      {due ? (
-        <View style={styles.dueBadge}>
-          <Txt style={styles.dueText}>{dueLabel(task) === 'Due now' ? 'Due' : dueLabel(task)}</Txt>
-        </View>
-      ) : null}
     </Pressable>
   )
 }
@@ -63,11 +57,4 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   struck: { textDecorationLine: 'line-through' },
   note: { flexDirection: 'row', alignItems: 'center' },
-  dueBadge: {
-    backgroundColor: color.noteBg,
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: radius.pill,
-  },
-  dueText: { fontFamily: 'Hanken_600', fontSize: 11, color: color.rust },
 })
