@@ -7,14 +7,21 @@ import { FullBleedPhoto } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { BalanceBar } from '@/components/BalanceBar'
-import { TaskCard } from '@/components/TaskCard'
 import { Card } from '@/components/Card'
 import { Avatar } from '@/components/Avatar'
+import { Checkbox } from '@/components/Checkbox'
 import { color, photoTextShadow } from '@/theme/tokens'
 import { todaysTasks, progressOf, weekCounts } from '@/lib/stats'
 import { isCheckedOff } from '@/lib/frequency'
 import { partnerOf } from '@/lib/identity'
-import type { Task } from '@/types'
+import type { Frequency, Task } from '@/types'
+
+// Today's tasks are grouped into cadence blocks instead of one long list.
+const GROUPS: { label: string; freqs: Frequency[] }[] = [
+  { label: 'Today', freqs: ['Daily'] },
+  { label: 'This week', freqs: ['Weekly', 'Bi-Weekly'] },
+  { label: 'This month', freqs: ['Monthly', 'Quarterly'] },
+]
 
 export default function TodayScreen() {
   const router = useRouter()
@@ -26,6 +33,14 @@ export default function TodayScreen() {
     [tasks, completions],
   )
   const ring = useMemo(() => progressOf(today), [today])
+  const groups = useMemo(
+    () =>
+      GROUPS.map((g) => ({
+        label: g.label,
+        tasks: today.filter((t) => g.freqs.includes(t.frequency)),
+      })).filter((g) => g.tasks.length > 0),
+    [today],
+  )
   const week = useMemo(() => weekCounts(completions), [completions])
   const weekTotal = week.Meg + week.Leti
   const megPct = weekTotal ? (week.Meg / weekTotal) * 100 : 50
@@ -91,15 +106,35 @@ export default function TodayScreen() {
             </Card>
           </Pressable>
 
-          {today.map((t) => (
-            <TaskCard
-              key={t.id}
-              task={t}
-              onPress={() => router.push(`/task/${t.id}`)}
-              onToggle={() => toggle(t)}
-            />
+          {groups.map((g) => (
+            <View key={g.label} style={{ gap: 8 }}>
+              <Txt variant="eyebrow" color="rgba(255,255,255,0.92)" style={photoTextShadow}>
+                {g.label}
+              </Txt>
+              <Card padded={false} style={{ overflow: 'hidden' }}>
+                {g.tasks.map((t, i) => {
+                  const done = isCheckedOff(t)
+                  return (
+                    <Pressable
+                      key={t.id}
+                      onPress={() => router.push(`/task/${t.id}`)}
+                      style={[styles.row, i > 0 && styles.rowBorder]}>
+                      <Checkbox checked={done} owner={t.owner} size={24} onToggle={() => toggle(t)} />
+                      <Txt
+                        variant="bodyMed"
+                        numberOfLines={1}
+                        style={[{ flex: 1 }, done && styles.struck]}
+                        color={done ? color.muted : color.ink}>
+                        {t.name}
+                      </Txt>
+                      <Avatar owner={t.owner} size={20} />
+                    </Pressable>
+                  )
+                })}
+              </Card>
+            </View>
           ))}
-          {today.length === 0 && (
+          {groups.length === 0 && (
             <Card style={{ alignItems: 'center', paddingVertical: 28 }}>
               <Txt variant="bodyMed">All done for today 🎉</Txt>
               <Txt variant="meta" style={{ marginTop: 2 }}>
@@ -126,7 +161,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  body: { paddingHorizontal: 24, marginTop: 26, gap: 11 },
+  body: { paddingHorizontal: 24, marginTop: 26, gap: 16 },
   balanceHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   legendRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 13 },
+  rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  struck: { textDecorationLine: 'line-through' },
 })
+
