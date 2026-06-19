@@ -47,6 +47,35 @@ export interface Completion {
   at: string // ISO
 }
 
+export interface Ingredient {
+  name: string
+  qty?: string
+}
+
+export interface GroceryItem {
+  id: string
+  name: string
+  status: 'toBuy' | 'inCart'
+  addedBy: MemberName
+  recipeId: string | null
+  createdAt: string
+}
+
+export interface Recipe {
+  id: string
+  name: string
+  ingredients: Ingredient[]
+  createdBy: MemberName
+}
+
+export interface MealEntry {
+  id: string
+  date: string // YYYY-MM-DD
+  recipeId: string
+  cook: MemberName | null
+  pushedToGrocery: boolean
+}
+
 export interface Insight {
   weekStart: string
   observation: string

@@ -16,6 +16,19 @@ export function startOfWeek(now = new Date()): Date {
   return d
 }
 
+/** Local YYYY-MM-DD key for a date. */
+export function toDateKey(d: Date): string {
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
+
+/** The seven dates Mon–Sun of the current week. */
+export function weekDates(now = new Date()): Date[] {
+  const monday = startOfWeek(now)
+  return Array.from({ length: 7 }, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i))
+}
+
 export function completedToday(taskId: string, completions: Completion[], now = new Date()): boolean {
   return completions.some((c) => c.taskId === taskId && isSameDay(c.at, now))
 }

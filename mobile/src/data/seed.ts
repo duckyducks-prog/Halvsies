@@ -1,4 +1,4 @@
-import type { Area, Completion, Frequency, Member, Owner, Task } from '../types'
+import type { Area, Completion, Frequency, Member, Owner, Recipe, Task } from '../types'
 
 export const SEED_MEMBERS: Member[] = [
   { name: 'Meg', color: '#B0744A' }, // clay
@@ -97,3 +97,33 @@ for (const c of SEED_COMPLETIONS) {
   const t = SEED_TASKS.find((x) => x.id === c.taskId)
   if (t && (!t.lastDoneAt || t.lastDoneAt < c.at)) t.lastDoneAt = c.at
 }
+
+// Quick-add suggestions on the empty/building Grocery screen.
+export const GROCERY_STAPLES = ['Eggs', 'Milk', 'Bread', 'Coffee', 'Bananas', 'Chicken', 'Rice', 'Olive oil']
+
+// A couple of starter recipes so Recipes/Meals aren't empty on first run.
+export const SEED_RECIPES: Recipe[] = [
+  {
+    id: 'recipe-1',
+    name: 'Sheet-pan chicken & veg',
+    createdBy: 'Meg',
+    ingredients: [
+      { name: 'Chicken thighs', qty: '6' },
+      { name: 'Broccoli', qty: '1 head' },
+      { name: 'Olive oil' },
+      { name: 'Lemon', qty: '1' },
+    ],
+  },
+  {
+    id: 'recipe-2',
+    name: 'Pasta pomodoro',
+    createdBy: 'Leti',
+    ingredients: [
+      { name: 'Spaghetti', qty: '1 box' },
+      { name: 'Canned tomatoes', qty: '2' },
+      { name: 'Garlic' },
+      { name: 'Basil' },
+    ],
+  },
+  { id: 'recipe-3', name: 'Taco night', createdBy: 'Leti', ingredients: [] },
+]

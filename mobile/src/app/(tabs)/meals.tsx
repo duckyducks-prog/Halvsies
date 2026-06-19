@@ -1,25 +1,84 @@
-import { ScrollView, StyleSheet, View } from 'react-native'
-import { PhotoHeader } from '@/components/Photo'
+import { useMemo } from 'react'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { useRouter } from 'expo-router'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useData } from '@/state/DataProvider'
+import { FullBleedPhoto } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
-import { color, photoTextShadow } from '@/theme/tokens'
+import { Avatar } from '@/components/Avatar'
+import { Icon } from '@/components/Icon'
+import { color, photoTextShadow, radius } from '@/theme/tokens'
+import { toDateKey, weekDates } from '@/lib/stats'
 
 export default function MealsScreen() {
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const { meals, recipeById } = useData()
+  const days = useMemo(() => weekDates(), [])
+  const todayKey = toDateKey(new Date())
+
   return (
     <View style={styles.root}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        <PhotoHeader source={photos.meals}>
-          <Txt variant="display" color={color.white} style={photoTextShadow}>
-            This week
-          </Txt>
-        </PhotoHeader>
+        <View style={styles.header}>
+          <FullBleedPhoto source={photos.meals}>
+            <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24, flex: 1, justifyContent: 'space-between' }}>
+              <View style={styles.topRow}>
+                <Txt variant="display" color={color.white} style={photoTextShadow}>
+                  This week
+                </Txt>
+                <Pressable style={styles.recipesPill} onPress={() => router.push('/recipes')}>
+                  <Icon name="meals" size={16} color={color.white} />
+                  <Txt variant="label" color={color.white}>
+                    Recipes
+                  </Txt>
+                </Pressable>
+              </View>
+            </View>
+          </FullBleedPhoto>
+        </View>
+
         <View style={styles.body}>
-          <Card style={{ alignItems: 'center', gap: 8, paddingVertical: 36 }}>
-            <Txt variant="h2">Meal planning coming soon</Txt>
-            <Txt variant="meta" style={{ textAlign: 'center' }}>
-              Plan dinners for the week and push ingredients straight to the grocery list.
-            </Txt>
+          <Card padded={false} style={{ overflow: 'hidden' }}>
+            {days.map((d, i) => {
+              const key = toDateKey(d)
+              const entry = meals.find((m) => m.date === key)
+              const recipe = entry ? recipeById(entry.recipeId) : undefined
+              const isToday = key === todayKey
+              return (
+                <Pressable
+                  key={key}
+                  style={[styles.dayRow, i > 0 && styles.rowBorder, isToday && styles.todayRow]}
+                  onPress={() =>
+                    entry && recipe
+                      ? router.push({ pathname: '/recipe', params: { id: recipe.id } })
+                      : router.push({ pathname: '/add-dinner', params: { date: key } })
+                  }>
+                  <View style={styles.dateCol}>
+                    <Txt variant="meta" color={isToday ? color.meg : color.muted}>
+                      {d.toLocaleDateString(undefined, { weekday: 'short' })}
+                    </Txt>
+                    <Txt variant="h2" color={isToday ? color.meg : color.ink}>
+                      {d.getDate()}
+                    </Txt>
+                  </View>
+                  {entry && recipe ? (
+                    <>
+                      <Txt variant="bodyMed" style={{ flex: 1 }} numberOfLines={1}>
+                        {recipe.name}
+                      </Txt>
+                      {entry.cook && <Avatar owner={entry.cook} size={20} />}
+                    </>
+                  ) : (
+                    <Txt variant="body" color={color.faint} style={{ flex: 1 }}>
+                      + Add dinner…
+                    </Txt>
+                  )}
+                </Pressable>
+              )
+            })}
           </Card>
         </View>
       </ScrollView>
@@ -29,5 +88,15 @@ export default function MealsScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.porcelain },
-  body: { paddingHorizontal: 24, paddingTop: 12 },
+  header: { height: 220 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  recipesPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12,
+    borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.18)',
+  },
+  body: { paddingHorizontal: 24, marginTop: -24 },
+  dayRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 14 },
+  rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  todayRow: { backgroundColor: color.megSoft },
+  dateCol: { width: 38, alignItems: 'center' },
 })

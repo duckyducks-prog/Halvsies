@@ -6,7 +6,8 @@ import { Txt } from './Txt'
 
 interface Props {
   checked: boolean
-  owner: Owner
+  owner?: Owner
+  tint?: string
   size?: number
   onToggle: () => void
 }
@@ -17,8 +18,8 @@ function fillFor(owner: Owner): string {
 }
 
 /** The single completion affordance: tap to mark a task done. */
-export function Checkbox({ checked, owner, size = 26, onToggle }: Props) {
-  const fill = fillFor(owner)
+export function Checkbox({ checked, owner, tint, size = 26, onToggle }: Props) {
+  const fill = tint ?? (owner ? fillFor(owner) : color.ink)
   return (
     <Pressable
       hitSlop={10}
