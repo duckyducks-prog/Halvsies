@@ -12,20 +12,21 @@ const TABS: { path: string; icon: IconName; label: string }[] = [
   { path: '/meals', icon: 'meals', label: 'Meals' },
 ]
 
-// Slide-up sheets shouldn't show the tab bar.
-const HIDDEN_ON = ['/new-task', '/add-dinner', '/recipe']
-
-/** Custom frosted tab bar with a raised center "add" button. Persistent on every page. */
+/** Custom frosted tab bar with a raised center "add" button. Rendered on every screen. */
 export function TabBar() {
   const router = useRouter()
   const pathname = usePathname()
   const insets = useSafeAreaInsets()
 
-  if (HIDDEN_ON.includes(pathname)) return null
-
-  // Pushed screens map to their parent tab for highlighting.
+  // Pushed/modal screens map to their parent tab for highlighting.
   const activePath =
-    pathname === '/balance' ? '/' : pathname === '/recipes' ? '/meals' : pathname
+    pathname === '/balance'
+      ? '/'
+      : pathname === '/recipes' || pathname === '/add-dinner' || pathname === '/recipe'
+        ? '/meals'
+        : pathname === '/new-task'
+          ? '/'
+          : pathname
 
   const left = TABS.slice(0, 2)
   const right = TABS.slice(2)

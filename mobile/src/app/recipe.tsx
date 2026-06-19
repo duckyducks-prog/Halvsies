@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useData } from '@/state/DataProvider'
 import { Txt } from '@/components/Txt'
 import { Icon } from '@/components/Icon'
+import { TabBar } from '@/components/TabBar'
 import { color, font, radius } from '@/theme/tokens'
 import { getCurrentMember } from '@/lib/identity'
 import type { Ingredient, Recipe } from '@/types'
@@ -59,7 +60,7 @@ export default function RecipeEditor() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 60, gap: 18 }}>
+      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 120, gap: 18 }}>
         <View style={{ gap: 8 }}>
           <Txt variant="eyebrow">Name</Txt>
           <TextInput
@@ -116,6 +117,7 @@ export default function RecipeEditor() {
           </Pressable>
         )}
       </ScrollView>
+      <TabBar />
     </View>
   )
 }

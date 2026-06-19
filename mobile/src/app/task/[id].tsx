@@ -6,6 +6,7 @@ import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { Avatar } from '@/components/Avatar'
 import { Icon } from '@/components/Icon'
+import { TabBar } from '@/components/TabBar'
 import { color, font, radius, personColors } from '@/theme/tokens'
 import { isRecurring, nextResetLabel } from '@/lib/frequency'
 
@@ -121,6 +122,7 @@ export default function TaskDetail() {
           </View>
         </View>
       </ScrollView>
+      <TabBar />
     </View>
   )
 }

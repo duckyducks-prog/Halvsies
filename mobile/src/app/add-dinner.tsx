@@ -7,6 +7,7 @@ import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { Avatar } from '@/components/Avatar'
 import { Icon } from '@/components/Icon'
+import { TabBar } from '@/components/TabBar'
 import { color, radius } from '@/theme/tokens'
 import type { MemberName } from '@/types'
 
@@ -47,7 +48,7 @@ export default function AddDinner() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 60, gap: 18 }}>
+      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 130, gap: 18 }}>
         <View style={{ gap: 8 }}>
           <Txt variant="eyebrow">Choose a recipe</Txt>
           {recipes.map((r) => {
@@ -114,6 +115,7 @@ export default function AddDinner() {
           </Txt>
         </Pressable>
       </ScrollView>
+      <TabBar />
     </View>
   )
 }

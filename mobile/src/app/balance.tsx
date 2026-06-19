@@ -7,6 +7,7 @@ import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { BalanceBar } from '@/components/BalanceBar'
 import { Icon } from '@/components/Icon'
+import { TabBar } from '@/components/TabBar'
 import { color, radius } from '@/theme/tokens'
 import { weekCounts, isSameDay } from '@/lib/stats'
 
@@ -111,6 +112,7 @@ export default function BalanceScreen() {
           </View>
         </View>
       </ScrollView>
+      <TabBar />
     </View>
   )
 }

@@ -125,7 +125,7 @@ export default function GroceryScreen() {
       </ScrollView>
 
       {grocery.length > 0 && (
-        <View style={[styles.footer, { bottom: insets.bottom + 62 }]}>
+        <View style={[styles.footer, { bottom: insets.bottom + 78 }]}>
           <Pressable style={styles.primary} onPress={() => setShopping(true)}>
             <Icon name="grocery" color={color.white} size={20} />
             <Txt variant="label" color={color.white}>
@@ -211,7 +211,7 @@ function ShoppingView({
         </View>
       </ScrollView>
 
-      <View style={[styles.footerFloat, { bottom: insets.bottom + 62 }]}>
+      <View style={[styles.footerFloat, { bottom: insets.bottom + 78 }]}>
         <Pressable style={styles.primary} onPress={onDone}>
           <Txt variant="label" color={color.white}>
             Done shopping
@@ -252,7 +252,8 @@ const styles = StyleSheet.create({
   bar: { flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: color.hairline },
   footer: {
     position: 'absolute', left: 0, right: 0,
-    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 8,
+    paddingHorizontal: 24, paddingTop: 10, paddingBottom: 10,
+    backgroundColor: color.porcelain,
   },
   primary: {
     flexDirection: 'row', gap: 8, backgroundColor: color.ink, paddingVertical: 16,

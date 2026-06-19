@@ -7,6 +7,7 @@ import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { Icon } from '@/components/Icon'
+import { TabBar } from '@/components/TabBar'
 import { color, photoTextShadow, radius } from '@/theme/tokens'
 
 export default function RecipesScreen() {
@@ -74,6 +75,7 @@ export default function RecipesScreen() {
           })}
         </View>
       </ScrollView>
+      <TabBar />
     </View>
   )
 }
