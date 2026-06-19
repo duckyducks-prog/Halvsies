@@ -10,16 +10,18 @@ import { ProgressRing } from '@/components/ProgressRing'
 import { BalanceBar } from '@/components/BalanceBar'
 import { TaskCard } from '@/components/TaskCard'
 import { Card } from '@/components/Card'
+import { Avatar } from '@/components/Avatar'
 import { color, photoTextShadow } from '@/theme/tokens'
 import { todaysTasks, progressOf, weekCounts } from '@/lib/stats'
 import { isCheckedOff } from '@/lib/frequency'
+import { partnerOf } from '@/lib/identity'
 
 type Scope = 'Everyone' | 'Just me'
 
 export default function TodayScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const { tasks, completions, currentMember, completeTask, uncompleteTask } = useData()
+  const { tasks, completions, currentMember, setMember, completeTask, uncompleteTask } = useData()
   const [scope, setScope] = useState<Scope>('Everyone')
 
   const mine = (ownerSensitive: typeof tasks) =>
@@ -50,9 +52,19 @@ export default function TodayScreen() {
         <View style={styles.header}>
           <FullBleedPhoto source={photos.today}>
             <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 24, flex: 1 }}>
-              <Txt style={[styles.wordmark, photoTextShadow]} color={color.white}>
-                Halvsies
-              </Txt>
+              <View style={styles.topRow}>
+                <Txt style={[styles.wordmark, photoTextShadow]} color={color.white}>
+                  Halvsies
+                </Txt>
+                <Pressable
+                  onPress={() => setMember(partnerOf(currentMember))}
+                  style={styles.mePill}>
+                  <Avatar owner={currentMember} size={18} />
+                  <Txt variant="label" color={color.white}>
+                    {currentMember}
+                  </Txt>
+                </Pressable>
+              </View>
               <View style={styles.greetRow}>
                 <View style={{ flex: 1 }}>
                   <Txt
@@ -141,7 +153,17 @@ function Legend({ color: c, name, n }: { color: string; name: string; n: number 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.porcelain },
   header: { height: 320 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   wordmark: { fontFamily: 'Bricolage_700', fontSize: 15, letterSpacing: -0.3 },
+  mePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 9,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+  },
   greetRow: { flexDirection: 'row', alignItems: 'flex-end', flex: 1, paddingBottom: 22, gap: 12 },
   body: { paddingHorizontal: 24, marginTop: -28, gap: 14 },
   segment: { flexDirection: 'row', backgroundColor: color.surfaceAlt, borderRadius: 20, padding: 3 },

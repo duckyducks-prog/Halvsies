@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import type { Owner } from '../types'
 import { color, personColors } from '../theme/tokens'
@@ -23,7 +23,7 @@ export function Checkbox({ checked, owner, size = 26, onToggle }: Props) {
     <Pressable
       hitSlop={10}
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+        if (Platform.OS !== 'web') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
         onToggle()
       }}
       accessibilityRole="checkbox"

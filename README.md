@@ -1,4 +1,16 @@
-# Homebase 🏠
+> ## 👉 The app is **Halvsies**, in [`/mobile`](./mobile) — not this folder.
+> This root is the **legacy web prototype** (kept as a reference). The real, current product is the
+> native **Expo** app under `/mobile`. To run it:
+> ```bash
+> cd mobile && npm install
+> npm run dev      # browser preview (opens in your browser)
+> # or: npx expo start  → scan the QR with Expo Go on your phone for the true native app
+> ```
+> Running `npm run dev` *here at the root* launches the old web UI below — that's the "outdated UI".
+
+---
+
+# Homebase 🏠 (legacy web reference)
 
 A simple, mobile-first, cloud-synced household app for two people (**Meg & Leti**),
 built from their Chore Tracker spreadsheet. Installable as a PWA on iPhone & Android.
