@@ -17,7 +17,7 @@ export default function RecipesScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         <PhotoHeader source={photos.recipes} height={210}>
           <Pressable
             onPress={() => router.back()}

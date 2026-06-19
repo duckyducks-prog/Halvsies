@@ -42,7 +42,7 @@ export default function TaskDetail() {
 
   return (
     <View style={styles.root}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
           <Pressable onPress={() => router.back()} style={styles.back} hitSlop={10}>
             <Icon name="chevronLeft" size={22} />
