@@ -7,9 +7,11 @@ interface Props {
   chore: Chore
   onToggle: (chore: Chore) => void
   onEdit: (chore: Chore) => void
+  onToggleReminder: (chore: Chore) => void
+  onNudge: (chore: Chore) => void
 }
 
-export function ChoreRow({ chore, onToggle, onEdit }: Props) {
+export function ChoreRow({ chore, onToggle, onEdit, onToggleReminder, onNudge }: Props) {
   const due = isDue(chore)
   return (
     <li className="flex items-center gap-3 px-4 py-3">
@@ -35,6 +37,27 @@ export function ChoreRow({ chore, onToggle, onEdit }: Props) {
             {dueLabel(chore)}
           </span>
         </span>
+      </button>
+
+      <button
+        aria-label={chore.reminderEnabled ? 'Turn reminder off' : 'Turn reminder on'}
+        aria-pressed={chore.reminderEnabled}
+        onClick={() => onToggleReminder(chore)}
+        className={`shrink-0 rounded-full p-1.5 text-base transition active:scale-90 ${
+          chore.reminderEnabled ? 'opacity-100' : 'opacity-30'
+        }`}
+        title={chore.reminderEnabled ? 'Reminder on' : 'Reminder off'}
+      >
+        {chore.reminderEnabled ? '🔔' : '🔕'}
+      </button>
+
+      <button
+        aria-label="Nudge partner about this chore"
+        onClick={() => onNudge(chore)}
+        className="shrink-0 rounded-full p-1.5 text-base opacity-60 transition active:scale-90"
+        title="Nudge partner"
+      >
+        👋
       </button>
 
       <OwnerBadge owner={chore.owner} />

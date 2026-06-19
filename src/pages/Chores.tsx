@@ -5,18 +5,33 @@ import { SEED_CATEGORIES } from '../data/seed'
 import { isDue } from '../lib/frequency'
 import { CategorySection } from '../components/CategorySection'
 import { AddChoreSheet } from '../components/AddChoreSheet'
+import { WeeklyInsightCard } from '../components/WeeklyInsightCard'
 import { isCloudEnabled } from '../lib/supabase'
+import { sendNudge } from '../lib/push'
+import { getCurrentMember } from '../lib/identity'
 
 type OwnerFilter = 'All' | Owner
 
 const OWNER_FILTERS: OwnerFilter[] = ['All', 'Meg', 'Leti', 'Both']
 
 export function Chores() {
-  const { chores, loading, error, toggleDone, upsertChore, deleteChore } = useChores()
+  const { chores, loading, error, toggleDone, toggleReminder, upsertChore, deleteChore } =
+    useChores()
   const [ownerFilter, setOwnerFilter] = useState<OwnerFilter>('All')
   const [dueOnly, setDueOnly] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [editing, setEditing] = useState<Chore | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+
+  const showToast = (msg: string) => {
+    setToast(msg)
+    window.setTimeout(() => setToast(null), 2500)
+  }
+
+  const handleNudge = async (chore: Chore) => {
+    const res = await sendNudge(chore.id, getCurrentMember())
+    showToast(res.ok ? 'Nudge sent 👋' : res.reason ?? 'Could not send nudge')
+  }
 
   const filtered = useMemo(() => {
     return chores.filter((c) => {
@@ -72,6 +87,8 @@ export function Chores() {
       </header>
 
       <main className="px-4 pt-3">
+        <WeeklyInsightCard />
+
         {loading && <p className="py-10 text-center text-slate-400">Loading…</p>}
         {error && (
           <p className="mb-3 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
@@ -85,6 +102,8 @@ export function Chores() {
               chores={filtered.filter((c) => c.categoryId === cat.id)}
               onToggle={toggleDone}
               onEdit={openEdit}
+              onToggleReminder={toggleReminder}
+              onNudge={handleNudge}
             />
           ))}
 
@@ -92,6 +111,14 @@ export function Chores() {
           <p className="py-10 text-center text-slate-400">Nothing here — you're all caught up! 🎉</p>
         )}
       </main>
+
+      {toast && (
+        <div className="fixed inset-x-0 bottom-28 z-40 flex justify-center px-4">
+          <div className="rounded-full bg-slate-800 px-4 py-2 text-sm text-white shadow-lg">
+            {toast}
+          </div>
+        </div>
+      )}
 
       {/* Floating add button */}
       <button

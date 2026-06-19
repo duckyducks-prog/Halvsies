@@ -33,6 +33,8 @@ const blank = (): Chore => ({
   done: false,
   lastDoneAt: null,
   sortOrder: Date.now(),
+  reminderEnabled: false,
+  reminderTime: null,
 })
 
 export function AddChoreSheet({ open, editing, categories, onClose, onSave, onDelete }: Props) {
@@ -113,6 +115,32 @@ export function AddChoreSheet({ open, editing, categories, onClose, onSave, onDe
               ))}
             </select>
           </label>
+        </div>
+
+        {/* Reminder */}
+        <div className="mb-4 rounded-xl border border-slate-200 p-3">
+          <label className="flex items-center justify-between">
+            <span className="text-[15px] text-slate-700">Remind me when due</span>
+            <input
+              type="checkbox"
+              checked={draft.reminderEnabled}
+              onChange={(e) => setDraft({ ...draft, reminderEnabled: e.target.checked })}
+              className="h-5 w-5 accent-brand-600"
+            />
+          </label>
+          {draft.reminderEnabled && (
+            <label className="mt-3 flex items-center justify-between">
+              <span className="text-xs font-medium text-slate-500">Time (optional)</span>
+              <input
+                type="time"
+                value={draft.reminderTime ?? ''}
+                onChange={(e) =>
+                  setDraft({ ...draft, reminderTime: e.target.value || null })
+                }
+                className="rounded-lg border border-slate-200 px-2 py-1 text-sm outline-none focus:border-brand-500"
+              />
+            </label>
+          )}
         </div>
 
         <div className="flex gap-3">

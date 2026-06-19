@@ -7,9 +7,18 @@ interface Props {
   chores: Chore[]
   onToggle: (chore: Chore) => void
   onEdit: (chore: Chore) => void
+  onToggleReminder: (chore: Chore) => void
+  onNudge: (chore: Chore) => void
 }
 
-export function CategorySection({ category, chores, onToggle, onEdit }: Props) {
+export function CategorySection({
+  category,
+  chores,
+  onToggle,
+  onEdit,
+  onToggleReminder,
+  onNudge,
+}: Props) {
   const [open, setOpen] = useState(true)
   if (chores.length === 0) return null
 
@@ -32,7 +41,14 @@ export function CategorySection({ category, chores, onToggle, onEdit }: Props) {
       {open && (
         <ul className="divide-y divide-slate-100 border-t border-slate-100">
           {chores.map((c) => (
-            <ChoreRow key={c.id} chore={c} onToggle={onToggle} onEdit={onEdit} />
+            <ChoreRow
+              key={c.id}
+              chore={c}
+              onToggle={onToggle}
+              onEdit={onEdit}
+              onToggleReminder={onToggleReminder}
+              onNudge={onNudge}
+            />
           ))}
         </ul>
       )}

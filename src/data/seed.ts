@@ -79,4 +79,6 @@ export const SEED_CHORES: Chore[] = RAW.map(([categoryId, name, frequency, owner
   done: false,
   lastDoneAt: null,
   sortOrder: i,
+  reminderEnabled: false,
+  reminderTime: null,
 }))

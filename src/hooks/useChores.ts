@@ -12,6 +12,8 @@ interface ChoreRow {
   done: boolean
   last_done_at: string | null
   sort_order: number
+  reminder_enabled: boolean
+  reminder_time: string | null
 }
 
 const fromRow = (r: ChoreRow): Chore => ({
@@ -23,6 +25,8 @@ const fromRow = (r: ChoreRow): Chore => ({
   done: r.done,
   lastDoneAt: r.last_done_at,
   sortOrder: r.sort_order,
+  reminderEnabled: r.reminder_enabled ?? false,
+  reminderTime: r.reminder_time ?? null,
 })
 
 const toRow = (c: Chore): ChoreRow => ({
@@ -34,6 +38,8 @@ const toRow = (c: Chore): ChoreRow => ({
   done: c.done,
   last_done_at: c.lastDoneAt,
   sort_order: c.sortOrder,
+  reminder_enabled: c.reminderEnabled,
+  reminder_time: c.reminderTime,
 })
 
 export interface UseChores {
@@ -41,6 +47,7 @@ export interface UseChores {
   loading: boolean
   error: string | null
   toggleDone: (chore: Chore) => void
+  toggleReminder: (chore: Chore) => void
   upsertChore: (chore: Chore) => void
   deleteChore: (id: string) => void
 }
@@ -128,6 +135,22 @@ export function useChores(): UseChores {
     [persistLocal, setBoth],
   )
 
+  const toggleReminder = useCallback(
+    (chore: Chore) => {
+      const updated: Chore = { ...chore, reminderEnabled: !chore.reminderEnabled }
+      const next = choresRef.current.map((c) => (c.id === chore.id ? updated : c))
+      if (isCloudEnabled && supabase) {
+        setBoth(next)
+        supabase.from('chores').update(toRow(updated)).eq('id', chore.id).then(({ error: err }) => {
+          if (err) setError(err.message)
+        })
+      } else {
+        persistLocal(next)
+      }
+    },
+    [persistLocal, setBoth],
+  )
+
   const upsertChore = useCallback(
     (chore: Chore) => {
       const exists = choresRef.current.some((c) => c.id === chore.id)
@@ -161,5 +184,5 @@ export function useChores(): UseChores {
     [persistLocal, setBoth],
   )
 
-  return { chores, loading, error, toggleDone, upsertChore, deleteChore }
+  return { chores, loading, error, toggleDone, toggleReminder, upsertChore, deleteChore }
 }
