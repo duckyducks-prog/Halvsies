@@ -28,9 +28,14 @@ export default function TodayScreen() {
   const insets = useSafeAreaInsets()
   const { tasks, completions, currentMember, setMember, completeTask, uncompleteTask } = useData()
 
+  // Today shows just this person's tasks (their own + shared). The full list
+  // across both people lives under the Tasks tab.
   const today = useMemo(
-    () => todaysTasks(tasks, completions).sort((a, b) => a.sortOrder - b.sortOrder),
-    [tasks, completions],
+    () =>
+      todaysTasks(tasks, completions)
+        .filter((t) => t.owner === currentMember || t.owner === 'Both')
+        .sort((a, b) => a.sortOrder - b.sortOrder),
+    [tasks, completions, currentMember],
   )
   const ring = useMemo(() => progressOf(today), [today])
   const groups = useMemo(
