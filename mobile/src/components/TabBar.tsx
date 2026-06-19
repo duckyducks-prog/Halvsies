@@ -12,17 +12,26 @@ const TABS: { path: string; icon: IconName; label: string }[] = [
   { path: '/meals', icon: 'meals', label: 'Meals' },
 ]
 
-/** Custom frosted tab bar with a raised center "add" button. */
+// Slide-up sheets shouldn't show the tab bar.
+const HIDDEN_ON = ['/new-task', '/add-dinner', '/recipe']
+
+/** Custom frosted tab bar with a raised center "add" button. Persistent on every page. */
 export function TabBar() {
   const router = useRouter()
   const pathname = usePathname()
   const insets = useSafeAreaInsets()
 
+  if (HIDDEN_ON.includes(pathname)) return null
+
+  // Pushed screens map to their parent tab for highlighting.
+  const activePath =
+    pathname === '/balance' ? '/' : pathname === '/recipes' ? '/meals' : pathname
+
   const left = TABS.slice(0, 2)
   const right = TABS.slice(2)
 
   const item = ({ path, icon, label }: (typeof TABS)[number]) => {
-    const focused = pathname === path
+    const focused = activePath === path
     return (
       <Pressable key={path} style={styles.item} onPress={() => router.navigate(path)}>
         <Icon name={icon} color={focused ? color.ink : color.faint} />
