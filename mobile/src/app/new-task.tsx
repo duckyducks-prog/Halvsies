@@ -6,6 +6,7 @@ import { useData } from '@/state/DataProvider'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { Avatar } from '@/components/Avatar'
+import { TabBar } from '@/components/TabBar'
 import { color, font, radius } from '@/theme/tokens'
 import type { Frequency, Owner, Task } from '@/types'
 
@@ -68,7 +69,7 @@ export default function NewTask() {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 100, gap: 18 }}>
+      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: insets.bottom + 130, gap: 18 }}>
         <Field label="Task">
           <TextInput
             value={name}
@@ -143,6 +144,7 @@ export default function NewTask() {
           </Txt>
         </Pressable>
       </ScrollView>
+      <TabBar />
     </View>
   )
 }

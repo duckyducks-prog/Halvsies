@@ -1,10 +1,9 @@
 import { Tabs } from 'expo-router'
+import { TabBar } from '@/components/TabBar'
 
 export default function TabsLayout() {
-  // The tab bar is rendered globally in the root layout (persistent on every
-  // page), so the navigator itself draws none.
   return (
-    <Tabs screenOptions={{ headerShown: false }} tabBar={() => null}>
+    <Tabs screenOptions={{ headerShown: false }} tabBar={() => <TabBar />}>
       <Tabs.Screen name="index" />
       <Tabs.Screen name="tasks" />
       <Tabs.Screen name="grocery" />
