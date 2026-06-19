@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react'
-import { View, StyleSheet, Image as RNImage, type ImageSourcePropType } from 'react-native'
+import { View, StyleSheet, Image as RNImage, Platform, type ImageSourcePropType } from 'react-native'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { color } from '../theme/tokens'
@@ -7,9 +7,11 @@ import { color } from '../theme/tokens'
 const halftone = require('../../assets/textures/halftone-tile.png')
 const grain = require('../../assets/textures/grain-256.png')
 
-/** Brand photo treatment: contrast + tiled halftone + grain (RN has no
- * mix-blend-mode, so these are approximated with opacity). */
+/** Brand photo treatment: tiled halftone + grain over the photo. Native only —
+ * `resizeMode="repeat"` doesn't tile on react-native-web (it renders a single
+ * square in the corner), so on web we rely on the scrim alone. */
 function Treatment() {
+  if (Platform.OS === 'web') return null
   return (
     <>
       <RNImage source={halftone} resizeMode="repeat" style={[StyleSheet.absoluteFill, { opacity: 0.12 }]} />
