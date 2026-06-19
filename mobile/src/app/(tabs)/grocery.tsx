@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useData } from '@/state/DataProvider'
-import { PhotoHeader } from '@/components/Photo'
+import { FullBleedPhoto, PhotoHeader } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
@@ -14,6 +15,7 @@ import type { GroceryItem } from '@/types'
 
 export default function GroceryScreen() {
   const { grocery, addGrocery, toggleGrocery, deleteGrocery, clearPurchased } = useData()
+  const insets = useSafeAreaInsets()
   const [text, setText] = useState('')
   const [shopping, setShopping] = useState(false)
 
@@ -123,7 +125,7 @@ export default function GroceryScreen() {
       </ScrollView>
 
       {grocery.length > 0 && (
-        <View style={styles.footer}>
+        <View style={[styles.footer, { bottom: insets.bottom + 62 }]}>
           <Pressable style={styles.primary} onPress={() => setShopping(true)}>
             <Icon name="grocery" color={color.white} size={20} />
             <Txt variant="label" color={color.white}>
@@ -149,63 +151,67 @@ function ShoppingView({
   onToggle: (i: GroceryItem) => void
   onDone: () => void
 }) {
+  const insets = useSafeAreaInsets()
   const pct = total > 0 ? inCart.length / total : 0
   return (
     <View style={styles.root}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: 64, paddingBottom: 140 }}>
-        <View style={styles.body}>
-          <View style={styles.shopHead}>
-            <Txt variant="display">Shopping</Txt>
-            <View style={styles.countPill}>
-              <Txt variant="label" color={color.white}>
-                {inCart.length} / {total}
-              </Txt>
+      <FullBleedPhoto source={photos.grocery} />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 150 }}>
+        <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24 }}>
+          <Txt style={[styles.wordmark, photoTextShadow]} color={color.white}>
+            Halvsies
+          </Txt>
+          <View style={{ marginTop: 22 }}>
+            <Txt variant="display" color={color.white} style={photoTextShadow}>
+              Shopping
+            </Txt>
+            <Txt variant="bodyMed" color="rgba(255,255,255,0.92)" style={[{ marginTop: 4 }, photoTextShadow]}>
+              {inCart.length} of {total} in the cart
+            </Txt>
+            <View style={styles.shopBar}>
+              <View style={{ flex: pct, backgroundColor: color.white }} />
+              <View style={{ flex: 1 - pct }} />
             </View>
           </View>
-          <View style={styles.bar}>
-            <View style={{ flex: pct, backgroundColor: color.leti }} />
-            <View style={{ flex: 1 - pct }} />
-          </View>
+        </View>
 
-          {toBuy.length > 0 && (
-            <>
-              <Txt variant="eyebrow" style={{ marginTop: 8 }}>
-                Still to get
-              </Txt>
-              <Card padded={false} style={{ overflow: 'hidden' }}>
-                {toBuy.map((item, i) => (
-                  <View key={item.id} style={[styles.row, i > 0 && styles.rowBorder]}>
-                    <Checkbox checked={false} tint={color.leti} size={26} onToggle={() => onToggle(item)} />
+        <View style={styles.shopBody}>
+          <Card padded={false} style={{ overflow: 'hidden' }}>
+            {toBuy.length > 0 && (
+              <>
+                <Txt variant="eyebrow" color={color.meg} style={styles.sectionLabel}>
+                  Still to get
+                </Txt>
+                {toBuy.map((item) => (
+                  <View key={item.id} style={[styles.row, styles.rowBorder]}>
+                    <Checkbox checked={false} tint={color.ink} size={26} onToggle={() => onToggle(item)} />
                     <Txt variant="body" style={{ flex: 1, fontSize: 16 }}>
                       {item.name}
                     </Txt>
                   </View>
                 ))}
-              </Card>
-            </>
-          )}
-
-          {inCart.length > 0 && (
-            <>
-              <Txt variant="eyebrow" style={{ marginTop: 8 }}>
-                In the cart
-              </Txt>
-              <Card padded={false} style={{ overflow: 'hidden' }}>
-                {inCart.map((item, i) => (
-                  <View key={item.id} style={[styles.row, i > 0 && styles.rowBorder]}>
+              </>
+            )}
+            {inCart.length > 0 && (
+              <>
+                <Txt variant="eyebrow" color={color.meg} style={styles.sectionLabel}>
+                  In the cart
+                </Txt>
+                {inCart.map((item) => (
+                  <View key={item.id} style={[styles.row, styles.rowBorder]}>
                     <Checkbox checked tint={color.ink} size={26} onToggle={() => onToggle(item)} />
                     <Txt variant="body" color={color.muted} style={[{ flex: 1, fontSize: 16 }, styles.struck]}>
                       {item.name}
                     </Txt>
                   </View>
                 ))}
-              </Card>
-            </>
-          )}
+              </>
+            )}
+          </Card>
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footerFloat, { bottom: insets.bottom + 62 }]}>
         <Pressable style={styles.primary} onPress={onDone}>
           <Txt variant="label" color={color.white}>
             Done shopping
@@ -245,11 +251,22 @@ const styles = StyleSheet.create({
   countPill: { backgroundColor: color.leti, paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill },
   bar: { flexDirection: 'row', height: 8, borderRadius: 4, overflow: 'hidden', backgroundColor: color.hairline },
   footer: {
-    position: 'absolute', left: 0, right: 0, bottom: 0,
-    paddingHorizontal: 24, paddingTop: 12, paddingBottom: 28, backgroundColor: color.porcelain,
+    position: 'absolute', left: 0, right: 0,
+    paddingHorizontal: 24, paddingTop: 8, paddingBottom: 8,
   },
   primary: {
     flexDirection: 'row', gap: 8, backgroundColor: color.ink, paddingVertical: 16,
     borderRadius: radius.button, alignItems: 'center', justifyContent: 'center',
+  },
+  wordmark: { fontFamily: 'Bricolage_700', fontSize: 15, letterSpacing: -0.3 },
+  shopBar: {
+    flexDirection: 'row', height: 6, borderRadius: 3, marginTop: 12, overflow: 'hidden',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  shopBody: { paddingHorizontal: 24, marginTop: 26 },
+  sectionLabel: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 4 },
+  footerFloat: {
+    position: 'absolute', left: 0, right: 0, bottom: 0,
+    paddingHorizontal: 24, paddingTop: 12, paddingBottom: 28,
   },
 })

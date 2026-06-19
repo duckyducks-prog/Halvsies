@@ -12,6 +12,16 @@ import { Icon } from '@/components/Icon'
 import { color, photoTextShadow, radius } from '@/theme/tokens'
 import { toDateKey, weekDates } from '@/lib/stats'
 
+function weekRange(days: Date[]): string {
+  const first = days[0]
+  const last = days[days.length - 1]
+  const m1 = first.toLocaleDateString(undefined, { month: 'long' })
+  const m2 = last.toLocaleDateString(undefined, { month: 'long' })
+  return first.getMonth() === last.getMonth()
+    ? `${first.getDate()} – ${last.getDate()} ${m2}`
+    : `${first.getDate()} ${m1} – ${last.getDate()} ${m2}`
+}
+
 export default function MealsScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -21,23 +31,28 @@ export default function MealsScreen() {
 
   return (
     <View style={styles.root}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={styles.header}>
-          <FullBleedPhoto source={photos.meals}>
-            <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24, flex: 1, justifyContent: 'space-between' }}>
-              <View style={styles.topRow}>
-                <Txt variant="display" color={color.white} style={photoTextShadow}>
-                  This week
-                </Txt>
-                <Pressable style={styles.recipesPill} onPress={() => router.push('/recipes')}>
-                  <Icon name="meals" size={16} color={color.white} />
-                  <Txt variant="label" color={color.white}>
-                    Recipes
-                  </Txt>
-                </Pressable>
-              </View>
-            </View>
-          </FullBleedPhoto>
+      <FullBleedPhoto source={photos.meals} />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 130 }}>
+        <View style={{ paddingTop: insets.top + 10, paddingHorizontal: 24 }}>
+          <View style={styles.topRow}>
+            <Txt style={[styles.wordmark, photoTextShadow]} color={color.white}>
+              Halvsies
+            </Txt>
+            <Pressable style={styles.recipesPill} onPress={() => router.push('/recipes')}>
+              <Icon name="meals" size={15} color={color.white} />
+              <Txt variant="label" color={color.white}>
+                Recipes
+              </Txt>
+            </Pressable>
+          </View>
+          <View style={{ marginTop: 22 }}>
+            <Txt variant="display" color={color.white} style={photoTextShadow}>
+              This week
+            </Txt>
+            <Txt variant="bodyMed" color="rgba(255,255,255,0.92)" style={[{ marginTop: 4 }, photoTextShadow]}>
+              Dinners · {weekRange(days)} · shared
+            </Txt>
+          </View>
         </View>
 
         <View style={styles.body}>
@@ -57,11 +72,8 @@ export default function MealsScreen() {
                       : router.push({ pathname: '/add-dinner', params: { date: key } })
                   }>
                   <View style={styles.dateCol}>
-                    <Txt variant="meta" color={isToday ? color.meg : color.muted}>
+                    <Txt variant="eyebrow" color={isToday ? color.meg : color.muted}>
                       {d.toLocaleDateString(undefined, { weekday: 'short' })}
-                    </Txt>
-                    <Txt variant="h2" color={isToday ? color.meg : color.ink}>
-                      {d.getDate()}
                     </Txt>
                   </View>
                   {entry && recipe ? (
@@ -73,7 +85,7 @@ export default function MealsScreen() {
                     </>
                   ) : (
                     <Txt variant="body" color={color.faint} style={{ flex: 1 }}>
-                      + Add dinner…
+                      Add a dinner…
                     </Txt>
                   )}
                 </Pressable>
@@ -88,15 +100,15 @@ export default function MealsScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.porcelain },
-  header: { height: 220 },
   topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  wordmark: { fontFamily: 'Bricolage_700', fontSize: 15, letterSpacing: -0.3 },
   recipesPill: {
     flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12,
     borderRadius: radius.pill, backgroundColor: 'rgba(255,255,255,0.18)',
   },
-  body: { paddingHorizontal: 24, marginTop: -24 },
-  dayRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 14 },
+  body: { paddingHorizontal: 24, marginTop: 26 },
+  dayRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 15 },
   rowBorder: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   todayRow: { backgroundColor: color.megSoft },
-  dateCol: { width: 38, alignItems: 'center' },
+  dateCol: { width: 44 },
 })
