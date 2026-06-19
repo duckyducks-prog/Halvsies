@@ -1,17 +1,33 @@
 import { type ReactNode } from 'react'
-import { View, StyleSheet, type ImageSourcePropType } from 'react-native'
+import { View, StyleSheet, Image as RNImage, type ImageSourcePropType } from 'react-native'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { color } from '../theme/tokens'
 
-/**
- * Photo header that fades into the porcelain page (used on Tasks, Grocery,
- * Recipes, Meals, Balance). Title/children render over the photo.
- *
- * NOTE: the brand halftone+grain treatment is approximated here with a scrim +
- * slight contrast; a baked halftone/grain overlay asset can drop in later
- * (see the asset list in the handoff brief).
- */
+const halftone = require('../../assets/textures/halftone-tile.png')
+const grain = require('../../assets/textures/grain-256.png')
+
+/** Brand photo treatment: contrast + tiled halftone + grain (RN has no
+ * mix-blend-mode, so these are approximated with opacity). */
+function Treatment() {
+  return (
+    <>
+      <RNImage source={halftone} resizeMode="repeat" style={[StyleSheet.absoluteFill, { opacity: 0.12 }]} />
+      <RNImage source={grain} resizeMode="repeat" style={[StyleSheet.absoluteFill, { opacity: 0.1 }]} />
+    </>
+  )
+}
+
+const HEADER_SCRIM = {
+  colors: ['rgba(28,28,22,0.34)', 'rgba(28,28,22,0.02)', 'rgba(28,28,22,0.50)', 'rgba(28,28,22,0.30)', color.porcelain],
+  locations: [0, 0.34, 0.82, 0.9, 1],
+} as const
+const BLEED_SCRIM = {
+  colors: ['rgba(28,26,20,0.50)', 'rgba(28,26,20,0.12)', 'rgba(28,26,20,0.10)', 'rgba(28,26,20,0.36)'],
+  locations: [0, 0.24, 0.58, 1],
+} as const
+
+/** Photo header that fades into the porcelain page (Tasks, Grocery, Recipes, Meals, Balance). */
 export function PhotoHeader({
   source,
   height = 236,
@@ -24,9 +40,10 @@ export function PhotoHeader({
   return (
     <View style={{ height }}>
       <Image source={source} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+      <Treatment />
       <LinearGradient
-        colors={['rgba(20,18,14,0.30)', 'rgba(20,18,14,0.05)', color.porcelain]}
-        locations={[0, 0.5, 1]}
+        colors={HEADER_SCRIM.colors}
+        locations={HEADER_SCRIM.locations}
         style={StyleSheet.absoluteFill}
       />
       <View style={styles.headerContent}>{children}</View>
@@ -45,9 +62,10 @@ export function FullBleedPhoto({
   return (
     <View style={StyleSheet.absoluteFill}>
       <Image source={source} style={StyleSheet.absoluteFill} contentFit="cover" />
+      <Treatment />
       <LinearGradient
-        colors={[color.scrimTop, 'transparent', 'transparent', color.scrimBottom]}
-        locations={[0, 0.28, 0.7, 1]}
+        colors={BLEED_SCRIM.colors}
+        locations={BLEED_SCRIM.locations}
         style={StyleSheet.absoluteFill}
       />
       {children}

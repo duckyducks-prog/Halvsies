@@ -79,5 +79,12 @@ export const shadow = {
   },
 } as const
 
+// White text over photos (from the asset-pack treatment spec).
+export const photoTextShadow = {
+  textShadowColor: 'rgba(20,18,12,0.55)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 16,
+} as const
+
 export const TAB_BAR_HEIGHT = 64
 export const isIOS = Platform.OS === 'ios'

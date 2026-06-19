@@ -7,7 +7,7 @@ import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Chip } from '@/components/Chip'
 import { TaskCard } from '@/components/TaskCard'
-import { color } from '@/theme/tokens'
+import { color, photoTextShadow } from '@/theme/tokens'
 import { isCheckedOff } from '@/lib/frequency'
 import type { Owner } from '@/types'
 
@@ -33,7 +33,7 @@ export default function TasksScreen() {
     <View style={styles.root}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         <PhotoHeader source={photos.tasks}>
-          <Txt variant="display" color={color.white}>
+          <Txt variant="display" color={color.white} style={photoTextShadow}>
             All tasks
           </Txt>
         </PhotoHeader>

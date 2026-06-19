@@ -10,7 +10,7 @@ import { ProgressRing } from '@/components/ProgressRing'
 import { BalanceBar } from '@/components/BalanceBar'
 import { TaskCard } from '@/components/TaskCard'
 import { Card } from '@/components/Card'
-import { color } from '@/theme/tokens'
+import { color, photoTextShadow } from '@/theme/tokens'
 import { todaysTasks, progressOf, weekCounts } from '@/lib/stats'
 import { isCheckedOff } from '@/lib/frequency'
 
@@ -50,15 +50,18 @@ export default function TodayScreen() {
         <View style={styles.header}>
           <FullBleedPhoto source={photos.today}>
             <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 24, flex: 1 }}>
-              <Txt style={styles.wordmark} color={color.white}>
+              <Txt style={[styles.wordmark, photoTextShadow]} color={color.white}>
                 Halvsies
               </Txt>
               <View style={styles.greetRow}>
                 <View style={{ flex: 1 }}>
-                  <Txt variant="eyebrow" color="rgba(255,255,255,0.85)" style={{ marginBottom: 6 }}>
+                  <Txt
+                    variant="eyebrow"
+                    color="rgba(255,255,255,0.9)"
+                    style={[{ marginBottom: 6 }, photoTextShadow]}>
                     {dateLabel}
                   </Txt>
-                  <Txt variant="display" color={color.white}>
+                  <Txt variant="display" color={color.white} style={photoTextShadow}>
                     Hey, {currentMember}
                   </Txt>
                 </View>

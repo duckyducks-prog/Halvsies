@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Halvsies">
+  <defs>
+    <linearGradient id="hv" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#B0744A"></stop>
+      <stop offset="1" stop-color="#558379"></stop>
+    </linearGradient>
+    <clipPath id="lensR"><circle cx="306" cy="256" r="120"></circle></clipPath>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#hv)"></rect>
+  <g fill="none" stroke="#F4F2EC" stroke-width="34">
+    <circle cx="206" cy="256" r="120"></circle>
+    <circle cx="306" cy="256" r="120"></circle>
+  </g>
+  <g clip-path="url(#lensR)"><circle cx="206" cy="256" r="120" fill="#F4F2EC"></circle></g>
+</svg>

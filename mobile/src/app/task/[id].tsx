@@ -46,9 +46,7 @@ export default function TaskDetail() {
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
         <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
           <Pressable onPress={() => router.back()} style={styles.back} hitSlop={10}>
-            <View style={{ transform: [{ rotate: '180deg' }] }}>
-              <Icon name="chevron" size={22} />
-            </View>
+            <Icon name="chevronLeft" size={22} />
             <Txt variant="label">Tasks</Txt>
           </Pressable>
 

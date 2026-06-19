@@ -3,14 +3,14 @@ import { PhotoHeader } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
-import { color } from '@/theme/tokens'
+import { color, photoTextShadow } from '@/theme/tokens'
 
 export default function GroceryScreen() {
   return (
     <View style={styles.root}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         <PhotoHeader source={photos.grocery}>
-          <Txt variant="display" color={color.white}>
+          <Txt variant="display" color={color.white} style={photoTextShadow}>
             Grocery
           </Txt>
         </PhotoHeader>

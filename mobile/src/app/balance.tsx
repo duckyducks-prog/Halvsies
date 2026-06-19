@@ -48,9 +48,7 @@ export default function BalanceScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60 }}>
         <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
           <Pressable onPress={() => router.back()} style={styles.back} hitSlop={10}>
-            <View style={{ transform: [{ rotate: '180deg' }] }}>
-              <Icon name="chevron" size={22} color={color.ink} />
-            </View>
+            <Icon name="chevronLeft" size={22} color={color.ink} />
             <Txt variant="label" color={color.ink}>
               Today
             </Txt>
