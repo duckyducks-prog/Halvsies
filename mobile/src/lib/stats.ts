@@ -29,20 +29,56 @@ export function weekDates(now = new Date()): Date[] {
   return Array.from({ length: 7 }, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i))
 }
 
+/** Canonical week key (Monday, local) shared by the app and the weekly-insight
+ *  Edge Function so reads, on-demand writes and the displayed bar never drift. */
+export function weekStartKey(now = new Date()): string {
+  return toDateKey(startOfWeek(now))
+}
+
 export function completedToday(taskId: string, completions: Completion[], now = new Date()): boolean {
   return completions.some((c) => c.taskId === taskId && isSameDay(c.at, now))
+}
+
+/** Per-member completion counts within the calendar week [weekStart, weekStart+7d). */
+export function countsForWeek(
+  completions: Completion[],
+  weekStart: Date,
+): { Meg: number; Leti: number } {
+  const start = weekStart.getTime()
+  const end = start + 7 * 24 * 60 * 60 * 1000
+  const out = { Meg: 0, Leti: 0 }
+  for (const c of completions) {
+    const t = new Date(c.at).getTime()
+    if (t >= start && t < end) out[c.member]++
+  }
+  return out
 }
 
 export function weekCounts(
   completions: Completion[],
   now = new Date(),
 ): { Meg: number; Leti: number } {
-  const start = startOfWeek(now).getTime()
-  const out = { Meg: 0, Leti: 0 }
-  for (const c of completions) {
-    if (new Date(c.at).getTime() >= start) out[c.member]++
-  }
-  return out
+  return countsForWeek(completions, startOfWeek(now))
+}
+
+/** Totals + rounded split for a week's counts. */
+export function weekSplit(counts: { Meg: number; Leti: number }): {
+  total: number
+  megPct: number
+  letiPct: number
+} {
+  const total = counts.Meg + counts.Leti
+  const megPct = total ? Math.round((counts.Meg / total) * 100) : 50
+  return { total, megPct, letiPct: 100 - megPct }
+}
+
+/** How this week's balance compares to last week's (distance from a 50/50 split). */
+export function balanceTrend(thisPct: number, lastPct: number): 'more even' | 'less even' | 'same' {
+  const thisGap = Math.abs(50 - thisPct)
+  const lastGap = Math.abs(50 - lastPct)
+  if (thisGap < lastGap) return 'more even'
+  if (thisGap > lastGap) return 'less even'
+  return 'same'
 }
 
 /** Tasks for "Today": recurring tasks not yet done this period (show until done),
