@@ -1,0 +1,39 @@
+/* Web/PWA only: declare the Halvsies type system statically so the real fonts
+ * render in the hosted build even if expo-font's runtime loader doesn't apply
+ * them. Family names match src/theme/tokens.ts. */
+@font-face {
+  font-family: 'Bricolage_700';
+  src: url('/fonts/Bricolage_700.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Bricolage_600';
+  src: url('/fonts/Bricolage_600.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hanken_400';
+  src: url('/fonts/Hanken_400.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hanken_500';
+  src: url('/fonts/Hanken_500.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hanken_600';
+  src: url('/fonts/Hanken_600.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Hanken_700';
+  src: url('/fonts/Hanken_700.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}

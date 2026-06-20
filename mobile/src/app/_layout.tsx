@@ -30,6 +30,14 @@ if (Platform.OS === 'web' && typeof document !== 'undefined') {
     l.href = '/icon-1024.png'
     return l
   })
+  // Static @font-face so the real Bricolage/Hanken type renders on web/PWA.
+  ensure('link[data-halvsies-fonts]', () => {
+    const l = document.createElement('link')
+    l.rel = 'stylesheet'
+    l.href = '/fonts.css'
+    l.setAttribute('data-halvsies-fonts', '')
+    return l
+  })
   const meta = (name: string, content: string) =>
     ensure(`meta[name="${name}"]`, () => {
       const m = document.createElement('meta')
