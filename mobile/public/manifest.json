@@ -1,0 +1,17 @@
+{
+  "name": "Halvsies",
+  "short_name": "Halvsies",
+  "description": "Share the household, evenly. Tasks, groceries, meals and a weekly balance for two.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F1F2F0",
+  "theme_color": "#F1F2F0",
+  "icons": [
+    { "src": "/icon-1024.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-1024.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-1024.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
