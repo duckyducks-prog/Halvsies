@@ -1,13 +1,11 @@
-// Scheduled (pg_cron, weekly): compute the week's chore balance, ask Claude for
-// a warm one-liner, and cache it in `insights` for the app to read.
+// Scheduled (pg_cron, weekly): compute the week's chore balance for the Halvsies
+// mobile app and ask Claude for a warm one-liner, cached in `insights` for the app.
+//
+// Reads the mobile schema: per-member completions from `completions` (the source
+// of truth for the Balance split) + task load per owner from `tasks`.
 import Anthropic from 'npm:@anthropic-ai/sdk'
 import { adminClient } from '../_shared/clients.ts'
-import { isDue, type ChoreRow } from '../_shared/due.ts'
 import { corsHeaders, json } from '../_shared/cors.ts'
-
-const MEMBERS = ['Meg', 'Leti', 'Both'] as const
-type Bucket = Record<(typeof MEMBERS)[number], number>
-const emptyBucket = (): Bucket => ({ Meg: 0, Leti: 0, Both: 0 })
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
@@ -25,6 +23,9 @@ function mondayOf(now: Date): string {
   return monday.toISOString().slice(0, 10)
 }
 
+interface CompletionRow { member: string; at: string }
+interface TaskRow { owner: string }
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
@@ -33,30 +34,29 @@ Deno.serve(async (req) => {
 
   const db = adminClient()
   const now = new Date()
+  const since = new Date(now.getTime() - WEEK_MS).toISOString()
 
-  const { data, error } = await db.from('chores').select('*')
-  if (error) return json({ error: error.message }, 500)
-  const chores = data as ChoreRow[]
+  const [{ data: comps, error: compErr }, { data: tasks, error: taskErr }] = await Promise.all([
+    db.from('completions').select('member, at').gte('at', since),
+    db.from('tasks').select('owner'),
+  ])
+  if (compErr) return json({ error: compErr.message }, 500)
+  if (taskErr) return json({ error: taskErr.message }, 500)
 
-  const completedLast7 = emptyBucket()
-  const openOverdue = emptyBucket()
-  const totalAssigned = emptyBucket()
+  const completedLast7 = { Meg: 0, Leti: 0 }
+  for (const c of (comps as CompletionRow[]) ?? []) {
+    if (c.member === 'Meg' || c.member === 'Leti') completedLast7[c.member]++
+  }
 
-  for (const c of chores) {
-    const owner = c.owner as keyof Bucket
-    if (!(owner in totalAssigned)) continue
-    totalAssigned[owner]++
-    if (c.last_done_at && now.getTime() - new Date(c.last_done_at).getTime() <= WEEK_MS) {
-      completedLast7[owner]++
-    }
-    if (isDue(c, now) && !c.done) openOverdue[owner]++
+  const tasksByOwner = { Meg: 0, Leti: 0, Both: 0 }
+  for (const t of (tasks as TaskRow[]) ?? []) {
+    if (t.owner === 'Meg' || t.owner === 'Leti' || t.owner === 'Both') tasksByOwner[t.owner]++
   }
 
   const stats = {
     week_start: mondayOf(now),
     completed_last_7_days: completedLast7,
-    open_overdue: openOverdue,
-    total_assigned: totalAssigned,
+    tasks_assigned: tasksByOwner,
   }
 
   const client = new Anthropic({ apiKey })

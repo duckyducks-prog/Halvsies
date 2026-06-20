@@ -10,7 +10,7 @@ import { BalanceBar } from '@/components/BalanceBar'
 import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Checkbox } from '@/components/Checkbox'
-import { color, photoTextShadow } from '@/theme/tokens'
+import { color, glassTextShadow, photoTextShadow } from '@/theme/tokens'
 import { todaysTasks, progressOf, weekCounts } from '@/lib/stats'
 import { isCheckedOff } from '@/lib/frequency'
 import { partnerOf } from '@/lib/identity'
@@ -96,15 +96,15 @@ export default function TodayScreen() {
           <Pressable onPress={() => router.push('/balance')}>
             <GlassCard style={{ gap: 10 }}>
               <View style={styles.balanceHead}>
-                <Txt variant="eyebrow">This week · {balanced ? 'Balanced' : 'Uneven'}</Txt>
-                <Txt variant="meta">{weekTotal} done</Txt>
+                <Txt variant="eyebrow" style={glassTextShadow}>This week · {balanced ? 'Balanced' : 'Uneven'}</Txt>
+                <Txt variant="meta" style={glassTextShadow}>{weekTotal} done</Txt>
               </View>
               <BalanceBar meg={week.Meg} leti={week.Leti} height={12} />
               <View style={styles.legendRow}>
-                <Txt variant="label" color={color.megDeep}>
+                <Txt variant="label" color={color.megDeep} style={glassTextShadow}>
                   Meg · {week.Meg}
                 </Txt>
-                <Txt variant="label" color={color.letiDeep}>
+                <Txt variant="label" color={color.letiDeep} style={glassTextShadow}>
                   Leti · {week.Leti}
                 </Txt>
               </View>
@@ -128,7 +128,7 @@ export default function TodayScreen() {
                       <Txt
                         variant="bodyMed"
                         numberOfLines={1}
-                        style={[{ flex: 1 }, done && styles.struck]}
+                        style={[{ flex: 1 }, glassTextShadow, done && styles.struck]}
                         color={done ? color.muted : color.ink}>
                         {t.name}
                       </Txt>

@@ -32,6 +32,7 @@ export default function RootLayout() {
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="new-task" options={{ presentation: 'modal' }} />
             <Stack.Screen name="add-dinner" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="nudge" options={{ presentation: 'modal' }} />
             <Stack.Screen name="recipe" options={{ presentation: 'modal' }} />
             <Stack.Screen name="task/[id]" />
             <Stack.Screen name="recipes" />

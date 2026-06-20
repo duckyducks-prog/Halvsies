@@ -86,5 +86,13 @@ export const photoTextShadow = {
   textShadowRadius: 16,
 } as const
 
+// Dark text sitting on a frosted GlassCard — a faint lift for definition,
+// much subtler than the white-on-photo shadow above.
+export const glassTextShadow = {
+  textShadowColor: 'rgba(20,18,12,0.16)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 2,
+} as const
+
 export const TAB_BAR_HEIGHT = 64
 export const isIOS = Platform.OS === 'ios'

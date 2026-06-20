@@ -9,7 +9,7 @@ import { Txt } from '@/components/Txt'
 import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Icon } from '@/components/Icon'
-import { color, photoTextShadow, radius } from '@/theme/tokens'
+import { color, glassTextShadow, photoTextShadow, radius } from '@/theme/tokens'
 import { toDateKey, weekDates } from '@/lib/stats'
 
 function weekRange(days: Date[]): string {
@@ -72,19 +72,22 @@ export default function MealsScreen() {
                       : router.push({ pathname: '/add-dinner', params: { date: key } })
                   }>
                   <View style={styles.dateCol}>
-                    <Txt variant="eyebrow" color={isToday ? color.meg : color.muted}>
+                    <Txt
+                      variant="eyebrow"
+                      color={isToday ? color.meg : color.muted}
+                      style={glassTextShadow}>
                       {d.toLocaleDateString(undefined, { weekday: 'short' })}
                     </Txt>
                   </View>
                   {entry && recipe ? (
                     <>
-                      <Txt variant="bodyMed" style={{ flex: 1 }} numberOfLines={1}>
+                      <Txt variant="bodyMed" style={[{ flex: 1 }, glassTextShadow]} numberOfLines={1}>
                         {recipe.name}
                       </Txt>
                       {entry.cook && <Avatar owner={entry.cook} size={20} />}
                     </>
                   ) : (
-                    <Txt variant="body" color={color.muted} style={{ flex: 1 }}>
+                    <Txt variant="body" color={color.leti} style={[{ flex: 1 }, glassTextShadow]}>
                       Add a dinner…
                     </Txt>
                   )}

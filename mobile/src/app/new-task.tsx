@@ -16,12 +16,14 @@ const REPEATS: Frequency[] = ['Daily', 'Weekly', 'Bi-Weekly', 'Monthly', 'As nee
 export default function NewTask() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const { id } = useLocalSearchParams<{ id?: string }>()
+  const { id, owner: ownerParam } = useLocalSearchParams<{ id?: string; owner?: string }>()
   const { taskById, areas, upsertTask } = useData()
   const editing = id ? taskById(String(id)) : undefined
 
+  const presetOwner = OWNERS.includes(ownerParam as Owner) ? (ownerParam as Owner) : undefined
+
   const [name, setName] = useState(editing?.name ?? '')
-  const [owner, setOwner] = useState<Owner>(editing?.owner ?? 'Meg')
+  const [owner, setOwner] = useState<Owner>(editing?.owner ?? presetOwner ?? 'Meg')
   const [frequency, setFrequency] = useState<Frequency>(editing?.frequency ?? 'Weekly')
   const [note, setNote] = useState(editing?.note ?? '')
   const [reminder, setReminder] = useState(editing?.reminderEnabled ?? false)

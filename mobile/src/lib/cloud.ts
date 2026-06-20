@@ -65,6 +65,24 @@ export async function fetchAll(): Promise<CloudData> {
   }
 }
 
+/** Monday (UTC) of the current week as YYYY-MM-DD — matches the weekly-insight
+ *  Edge Function's key so the app reads the row the function wrote. */
+function isoWeekMondayUTC(now = new Date()): string {
+  const diff = (now.getUTCDay() + 6) % 7
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff))
+  return monday.toISOString().slice(0, 10)
+}
+
+/** The cached Claude weekly check-in for the current week, or null if none yet. */
+export async function fetchInsight(): Promise<string | null> {
+  const { data } = await supabase!
+    .from('insights')
+    .select('text')
+    .eq('week_start', isoWeekMondayUTC())
+    .maybeSingle()
+  return (data as { text: string } | null)?.text ?? null
+}
+
 /** First-run seed: populate empty tables from the chore tracker / starter recipes. */
 export async function seedIfEmpty(): Promise<void> {
   const db = supabase!
