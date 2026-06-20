@@ -7,7 +7,7 @@ import { FullBleedPhoto } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { BalanceBar } from '@/components/BalanceBar'
-import { Card } from '@/components/Card'
+import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Checkbox } from '@/components/Checkbox'
 import { color, photoTextShadow } from '@/theme/tokens'
@@ -94,7 +94,7 @@ export default function TodayScreen() {
         {/* Floating cards over the photo */}
         <View style={styles.body}>
           <Pressable onPress={() => router.push('/balance')}>
-            <Card style={{ gap: 10 }}>
+            <GlassCard style={{ gap: 10 }}>
               <View style={styles.balanceHead}>
                 <Txt variant="eyebrow">This week · {balanced ? 'Balanced' : 'Uneven'}</Txt>
                 <Txt variant="meta">{weekTotal} done</Txt>
@@ -108,7 +108,7 @@ export default function TodayScreen() {
                   Leti · {week.Leti}
                 </Txt>
               </View>
-            </Card>
+            </GlassCard>
           </Pressable>
 
           {groups.map((g) => (
@@ -116,7 +116,7 @@ export default function TodayScreen() {
               <Txt variant="eyebrow" color="rgba(255,255,255,0.92)" style={photoTextShadow}>
                 {g.label}
               </Txt>
-              <Card padded={false} style={{ overflow: 'hidden' }}>
+              <GlassCard padded={false}>
                 {g.tasks.map((t, i) => {
                   const done = isCheckedOff(t)
                   return (
@@ -136,16 +136,16 @@ export default function TodayScreen() {
                     </Pressable>
                   )
                 })}
-              </Card>
+              </GlassCard>
             </View>
           ))}
           {groups.length === 0 && (
-            <Card style={{ alignItems: 'center', paddingVertical: 28 }}>
+            <GlassCard style={{ alignItems: 'center', paddingVertical: 28 }}>
               <Txt variant="bodyMed">All done for today 🎉</Txt>
               <Txt variant="meta" style={{ marginTop: 2 }}>
                 Nothing left on your list.
               </Txt>
-            </Card>
+            </GlassCard>
           )}
         </View>
       </ScrollView>

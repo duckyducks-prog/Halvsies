@@ -6,7 +6,7 @@ import { useData } from '@/state/DataProvider'
 import { FullBleedPhoto } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
-import { Card } from '@/components/Card'
+import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Icon } from '@/components/Icon'
 import { color, photoTextShadow, radius } from '@/theme/tokens'
@@ -56,7 +56,7 @@ export default function MealsScreen() {
         </View>
 
         <View style={styles.body}>
-          <Card padded={false} style={{ overflow: 'hidden' }}>
+          <GlassCard padded={false}>
             {days.map((d, i) => {
               const key = toDateKey(d)
               const entry = meals.find((m) => m.date === key)
@@ -91,7 +91,7 @@ export default function MealsScreen() {
                 </Pressable>
               )
             })}
-          </Card>
+          </GlassCard>
         </View>
       </ScrollView>
     </View>

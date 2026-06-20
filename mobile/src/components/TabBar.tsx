@@ -35,11 +35,11 @@ export function TabBar() {
     const focused = activePath === path
     return (
       <Pressable key={path} style={styles.item} onPress={() => router.navigate(path)}>
-        <Icon name={icon} color={focused ? color.ink : color.faint} />
+        <Icon name={icon} color={focused ? color.ink : color.muted} />
         <Text
           style={[
             styles.label,
-            { fontFamily: focused ? font.bold : font.semibold, color: focused ? color.ink : color.faint },
+            { fontFamily: focused ? font.bold : font.semibold, color: focused ? color.ink : color.muted },
           ]}>
           {label}
         </Text>
