@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.card,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.92)',
+    backgroundColor: 'rgba(255,255,255,0.96)',
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: 'rgba(255,255,255,0.5)',
     ...shadow.card,
