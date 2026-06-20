@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: color.hairline,
-    backgroundColor: 'rgba(248,247,243,0.94)',
+    backgroundColor: 'rgba(248,247,243,0.985)',
   },
   row: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, paddingHorizontal: 8 },
   item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },

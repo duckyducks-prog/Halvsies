@@ -84,7 +84,7 @@ export default function MealsScreen() {
                       {entry.cook && <Avatar owner={entry.cook} size={20} />}
                     </>
                   ) : (
-                    <Txt variant="body" color={color.faint} style={{ flex: 1 }}>
+                    <Txt variant="body" color={color.muted} style={{ flex: 1 }}>
                       Add a dinner…
                     </Txt>
                   )}
