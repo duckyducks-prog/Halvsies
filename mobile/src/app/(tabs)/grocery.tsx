@@ -6,6 +6,7 @@ import { FullBleedPhoto, PhotoHeader } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
+import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Checkbox } from '@/components/Checkbox'
 import { Icon } from '@/components/Icon'
@@ -176,7 +177,7 @@ function ShoppingView({
         </View>
 
         <View style={styles.shopBody}>
-          <Card padded={false} style={{ overflow: 'hidden' }}>
+          <GlassCard padded={false}>
             {toBuy.length > 0 && (
               <>
                 <Txt variant="eyebrow" color={color.meg} style={styles.sectionLabel}>
@@ -207,7 +208,7 @@ function ShoppingView({
                 ))}
               </>
             )}
-          </Card>
+          </GlassCard>
         </View>
       </ScrollView>
 
