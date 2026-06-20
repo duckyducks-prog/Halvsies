@@ -157,7 +157,7 @@ export default function BalanceScreen() {
                 <View style={styles.chipRow}>
                   <Pressable
                     style={styles.inkChip}
-                    onPress={() => router.push({ pathname: '/new-task', params: { owner: currentMember } })}>
+                    onPress={() => router.push({ pathname: '/pick-up', params: { owner: partner } })}>
                     <Txt variant="label" color={color.white}>
                       Pick up a task
                     </Txt>
