@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -6,9 +6,13 @@ import { useData } from '@/state/DataProvider'
 import { Txt } from '@/components/Txt'
 import { Card } from '@/components/Card'
 import { BalanceBar } from '@/components/BalanceBar'
+import { PhotoHeader } from '@/components/Photo'
+import { photos } from '@/lib/photos'
 import { Icon } from '@/components/Icon'
 import { TabBar } from '@/components/TabBar'
-import { color, radius } from '@/theme/tokens'
+import { fetchInsight } from '@/lib/cloud'
+import { partnerOf } from '@/lib/identity'
+import { color, photoTextShadow, radius } from '@/theme/tokens'
 import { weekCounts, isSameDay } from '@/lib/stats'
 
 function sharedStreak(ats: string[]): number {
@@ -28,7 +32,7 @@ function sharedStreak(ats: string[]): number {
 export default function BalanceScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
-  const { completions, currentMember } = useData()
+  const { completions, currentMember, cloud } = useData()
 
   const week = useMemo(() => weekCounts(completions), [completions])
   const total = week.Meg + week.Leti
@@ -37,27 +41,41 @@ export default function BalanceScreen() {
   const streak = useMemo(() => sharedStreak(completions.map((c) => c.at)), [completions])
   const doneToday = completions.filter((c) => isSameDay(c.at)).length
 
-  const partner = currentMember === 'Meg' ? 'Leti' : 'Meg'
+  const partner = partnerOf(currentMember)
   const lead = megPct === letiPct ? null : megPct > letiPct ? 'Meg' : 'Leti'
-  const message =
+  // The person who's carried less this week is who a re-balancing task goes to.
+  const behind = lead === null ? partner : lead === 'Meg' ? 'Leti' : 'Meg'
+
+  const fallbackMessage =
     lead === null
       ? "You're perfectly in sync this week — a true 50/50. 💛"
       : `${lead} has carried a bit more this week. A small nudge or swapping a task keeps things even.`
 
+  // Real Claude check-in (cached weekly by the Edge Function); falls back to the
+  // computed sentence in local mode or before the first run.
+  const [insight, setInsight] = useState<string | null>(null)
+  useEffect(() => {
+    if (!cloud) return
+    let active = true
+    fetchInsight()
+      .then((t) => { if (active) setInsight(t) })
+      .catch(() => {})
+    return () => { active = false }
+  }, [cloud])
+
+  const checkin = insight ?? fallbackMessage
+
   return (
     <View style={styles.root}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
-          <Pressable onPress={() => router.back()} style={styles.back} hitSlop={10}>
-            <Icon name="chevronLeft" size={22} color={color.ink} />
-            <Txt variant="label" color={color.ink}>
-              Today
-            </Txt>
-          </Pressable>
-          <Txt variant="display" style={{ marginTop: 10 }}>
+        <PhotoHeader source={photos.balance}>
+          <Txt variant="display" color={color.white} style={photoTextShadow}>
             Balance
           </Txt>
-        </View>
+          <Txt variant="bodyMed" color="rgba(255,255,255,0.92)" style={[{ marginTop: 4 }, photoTextShadow]}>
+            How the week is splitting
+          </Txt>
+        </PhotoHeader>
 
         <View style={styles.body}>
           {/* Check-in card */}
@@ -66,16 +84,20 @@ export default function BalanceScreen() {
               ✦ Halvsies check-in
             </Txt>
             <Txt variant="bodyMed" style={{ lineHeight: 21 }}>
-              {message}
+              {checkin}
             </Txt>
             {lead && (
               <View style={styles.chipRow}>
-                <Pressable style={styles.inkChip} onPress={() => router.push('/balance')}>
+                <Pressable
+                  style={styles.inkChip}
+                  onPress={() => router.push({ pathname: '/new-task', params: { owner: behind } })}>
                   <Txt variant="label" color={color.white}>
-                    Give {lead === 'Meg' ? 'Leti' : 'Meg'} a task
+                    Give {behind} a task
                   </Txt>
                 </Pressable>
-                <Pressable style={styles.outlineChip} onPress={() => router.push('/balance')}>
+                <Pressable
+                  style={styles.outlineChip}
+                  onPress={() => router.push({ pathname: '/nudge', params: { to: partner } })}>
                   <Txt variant="label" color={color.ink}>
                     Nudge {partner}
                   </Txt>
@@ -112,6 +134,14 @@ export default function BalanceScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Back control floats over the photo header */}
+      <Pressable onPress={() => router.back()} style={[styles.back, { top: insets.top + 6 }]} hitSlop={10}>
+        <Icon name="chevronLeft" size={22} color={color.white} />
+        <Txt variant="label" color={color.white} style={photoTextShadow}>
+          Today
+        </Txt>
+      </Pressable>
       <TabBar />
     </View>
   )
@@ -130,9 +160,8 @@ function Legend({ c, name, n }: { c: string; name: string; n: number }) {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.porcelain },
-  header: { paddingHorizontal: 24, paddingBottom: 6 },
-  back: { flexDirection: 'row', alignItems: 'center', gap: 2, marginLeft: -4 },
-  body: { paddingHorizontal: 24, paddingTop: 12, gap: 14 },
+  back: { position: 'absolute', left: 20, flexDirection: 'row', alignItems: 'center', gap: 2 },
+  body: { paddingHorizontal: 24, paddingTop: 16, gap: 14 },
   checkin: { backgroundColor: '#EFF2EF', borderWidth: 1, borderColor: color.letiSoft },
   chipRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
   inkChip: { backgroundColor: color.ink, paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill },

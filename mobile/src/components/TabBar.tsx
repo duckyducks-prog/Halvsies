@@ -24,7 +24,7 @@ export function TabBar() {
       ? '/'
       : pathname === '/recipes' || pathname === '/add-dinner' || pathname === '/recipe'
         ? '/meals'
-        : pathname === '/new-task'
+        : pathname === '/new-task' || pathname === '/nudge'
           ? '/'
           : pathname
 

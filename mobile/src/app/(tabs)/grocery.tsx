@@ -10,7 +10,7 @@ import { GlassCard } from '@/components/GlassCard'
 import { Avatar } from '@/components/Avatar'
 import { Checkbox } from '@/components/Checkbox'
 import { Icon } from '@/components/Icon'
-import { color, font, photoTextShadow, radius } from '@/theme/tokens'
+import { color, font, glassTextShadow, photoTextShadow, radius } from '@/theme/tokens'
 import { GROCERY_STAPLES } from '@/data/seed'
 import type { GroceryItem } from '@/types'
 
@@ -180,13 +180,13 @@ function ShoppingView({
           <GlassCard padded={false}>
             {toBuy.length > 0 && (
               <>
-                <Txt variant="eyebrow" color={color.meg} style={styles.sectionLabel}>
+                <Txt variant="eyebrow" color={color.meg} style={[styles.sectionLabel, glassTextShadow]}>
                   Still to get
                 </Txt>
                 {toBuy.map((item) => (
                   <View key={item.id} style={[styles.row, styles.rowBorder]}>
                     <Checkbox checked={false} tint={color.ink} size={26} onToggle={() => onToggle(item)} />
-                    <Txt variant="body" style={{ flex: 1, fontSize: 16 }}>
+                    <Txt variant="body" style={[{ flex: 1, fontSize: 16 }, glassTextShadow]}>
                       {item.name}
                     </Txt>
                   </View>
@@ -195,13 +195,13 @@ function ShoppingView({
             )}
             {inCart.length > 0 && (
               <>
-                <Txt variant="eyebrow" color={color.meg} style={styles.sectionLabel}>
+                <Txt variant="eyebrow" color={color.meg} style={[styles.sectionLabel, glassTextShadow]}>
                   In the cart
                 </Txt>
                 {inCart.map((item) => (
                   <View key={item.id} style={[styles.row, styles.rowBorder]}>
                     <Checkbox checked tint={color.ink} size={26} onToggle={() => onToggle(item)} />
-                    <Txt variant="body" color={color.muted} style={[{ flex: 1, fontSize: 16 }, styles.struck]}>
+                    <Txt variant="body" color={color.muted} style={[{ flex: 1, fontSize: 16 }, styles.struck, glassTextShadow]}>
                       {item.name}
                     </Txt>
                   </View>
