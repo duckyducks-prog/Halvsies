@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useData } from '@/state/DataProvider'
@@ -10,10 +10,18 @@ import { PhotoHeader } from '@/components/Photo'
 import { photos } from '@/lib/photos'
 import { Icon } from '@/components/Icon'
 import { TabBar } from '@/components/TabBar'
-import { fetchInsight } from '@/lib/cloud'
+import { fetchInsight, refreshInsight } from '@/lib/cloud'
 import { partnerOf } from '@/lib/identity'
 import { color, photoTextShadow, radius } from '@/theme/tokens'
-import { weekCounts, isSameDay } from '@/lib/stats'
+import {
+  weekCounts,
+  countsForWeek,
+  weekSplit,
+  balanceTrend,
+  weekStartKey,
+  startOfWeek,
+  isSameDay,
+} from '@/lib/stats'
 
 function sharedStreak(ats: string[]): number {
   if (ats.length === 0) return 0
@@ -35,33 +43,58 @@ export default function BalanceScreen() {
   const { completions, currentMember, cloud } = useData()
 
   const week = useMemo(() => weekCounts(completions), [completions])
-  const total = week.Meg + week.Leti
-  const megPct = total ? Math.round((week.Meg / total) * 100) : 50
-  const letiPct = 100 - megPct
+  const { total, megPct, letiPct } = weekSplit(week)
   const streak = useMemo(() => sharedStreak(completions.map((c) => c.at)), [completions])
   const doneToday = completions.filter((c) => isSameDay(c.at)).length
 
+  // Last week's split, for the week-over-week comparison line.
+  const lastWeek = useMemo(() => {
+    const lastMonday = startOfWeek(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+    return weekSplit(countsForWeek(completions, lastMonday))
+  }, [completions])
+  const trend = lastWeek.total ? balanceTrend(megPct, lastWeek.megPct) : null
+
   const partner = partnerOf(currentMember)
   const lead = megPct === letiPct ? null : megPct > letiPct ? 'Meg' : 'Leti'
-  // The person who's carried less this week is who a re-balancing task goes to.
-  const behind = lead === null ? partner : lead === 'Meg' ? 'Leti' : 'Meg'
+  const iDidMore = lead !== null && currentMember === lead
 
+  // The re-balancing offer adapts to who's viewing: if you carried less, the move
+  // is to pick up a task; if you carried more, hand your partner one (or nudge them).
   const fallbackMessage =
     lead === null
       ? "You're perfectly in sync this week — a true 50/50. 💛"
-      : `${lead} has carried a bit more this week. A small nudge or swapping a task keeps things even.`
+      : iDidMore
+        ? `You've carried a bit more this week — handing ${partner} a task or a gentle nudge keeps things even.`
+        : `${partner} has carried a bit more this week — picking up a task keeps you both balanced. 💛`
 
   // Real Claude check-in (cached weekly by the Edge Function); falls back to the
-  // computed sentence in local mode or before the first run.
+  // computed sentence in local mode or before the first run. Cloud users can also
+  // trigger a fresh one on demand via the refresh control.
+  const weekKey = weekStartKey()
   const [insight, setInsight] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshError, setRefreshError] = useState(false)
   useEffect(() => {
     if (!cloud) return
     let active = true
-    fetchInsight()
+    fetchInsight(weekKey)
       .then((t) => { if (active) setInsight(t) })
       .catch(() => {})
     return () => { active = false }
-  }, [cloud])
+  }, [cloud, weekKey])
+
+  const onRefresh = async () => {
+    setRefreshing(true)
+    setRefreshError(false)
+    try {
+      const t = await refreshInsight(weekKey)
+      if (t) setInsight(t)
+    } catch {
+      setRefreshError(true)
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const checkin = insight ?? fallbackMessage
 
@@ -80,30 +113,57 @@ export default function BalanceScreen() {
         <View style={styles.body}>
           {/* Check-in card */}
           <Card style={styles.checkin}>
-            <Txt variant="eyebrow" color={color.leti} style={{ marginBottom: 8 }}>
-              ✦ Halvsies check-in
-            </Txt>
+            <View style={styles.eyebrowRow}>
+              <Txt variant="eyebrow" color={color.leti}>
+                ✦ Halvsies check-in
+              </Txt>
+              {cloud && (
+                <Pressable onPress={onRefresh} disabled={refreshing} hitSlop={10}>
+                  {refreshing ? (
+                    <ActivityIndicator size="small" color={color.leti} />
+                  ) : (
+                    <Icon name="repeat" size={16} color={color.muted} />
+                  )}
+                </Pressable>
+              )}
+            </View>
             <Txt variant="bodyMed" style={{ lineHeight: 21 }}>
               {checkin}
             </Txt>
-            {lead && (
-              <View style={styles.chipRow}>
-                <Pressable
-                  style={styles.inkChip}
-                  onPress={() => router.push({ pathname: '/new-task', params: { owner: behind } })}>
-                  <Txt variant="label" color={color.white}>
-                    Give {behind} a task
-                  </Txt>
-                </Pressable>
-                <Pressable
-                  style={styles.outlineChip}
-                  onPress={() => router.push({ pathname: '/nudge', params: { to: partner } })}>
-                  <Txt variant="label" color={color.ink}>
-                    Nudge {partner}
-                  </Txt>
-                </Pressable>
-              </View>
+            {refreshError && (
+              <Txt variant="meta" color={color.rust} style={{ marginTop: 6 }}>
+                Couldn't reach the check-in service — try again.
+              </Txt>
             )}
+            {lead &&
+              (iDidMore ? (
+                <View style={styles.chipRow}>
+                  <Pressable
+                    style={styles.inkChip}
+                    onPress={() => router.push({ pathname: '/new-task', params: { owner: partner } })}>
+                    <Txt variant="label" color={color.white}>
+                      Give {partner} a task
+                    </Txt>
+                  </Pressable>
+                  <Pressable
+                    style={styles.outlineChip}
+                    onPress={() => router.push({ pathname: '/nudge', params: { to: partner } })}>
+                    <Txt variant="label" color={color.ink}>
+                      Nudge {partner}
+                    </Txt>
+                  </Pressable>
+                </View>
+              ) : (
+                <View style={styles.chipRow}>
+                  <Pressable
+                    style={styles.inkChip}
+                    onPress={() => router.push({ pathname: '/pick-up', params: { owner: partner } })}>
+                    <Txt variant="label" color={color.white}>
+                      Pick up a task
+                    </Txt>
+                  </Pressable>
+                </View>
+              ))}
           </Card>
 
           {/* Split card */}
@@ -119,6 +179,12 @@ export default function BalanceScreen() {
               <Legend c={color.meg} name="Meg" n={week.Meg} />
               <Legend c={color.leti} name="Leti" n={week.Leti} />
             </View>
+            {trend && (
+              <Txt variant="meta" color={color.muted}>
+                Last week: {lastWeek.megPct}% · {lastWeek.letiPct}%
+                {trend === 'more even' ? ' · more even ↑' : trend === 'less even' ? ' · less even ↓' : ' · same balance'}
+              </Txt>
+            )}
           </Card>
 
           {/* Tiles */}
@@ -163,6 +229,7 @@ const styles = StyleSheet.create({
   back: { position: 'absolute', left: 20, flexDirection: 'row', alignItems: 'center', gap: 2 },
   body: { paddingHorizontal: 24, paddingTop: 16, gap: 14 },
   checkin: { backgroundColor: '#EFF2EF', borderWidth: 1, borderColor: color.letiSoft },
+  eyebrowRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   chipRow: { flexDirection: 'row', gap: 8, marginTop: 14 },
   inkChip: { backgroundColor: color.ink, paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill },
   outlineChip: {

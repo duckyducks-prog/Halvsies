@@ -34,18 +34,28 @@ Deno.serve(async (req) => {
 
   const db = adminClient()
   const now = new Date()
-  const since = new Date(now.getTime() - WEEK_MS).toISOString()
+
+  // The calendar week to analyse. The app passes its own Monday so Claude reads
+  // exactly the window the Balance bar shows; with no body we derive Monday (UTC).
+  let weekStart = mondayOf(now)
+  if (req.method === 'POST') {
+    const body = await req.json().catch(() => null)
+    if (body && typeof body.week_start === 'string') weekStart = body.week_start
+  }
+  const weekStartMs = Date.parse(`${weekStart}T00:00:00Z`)
+  const windowStart = new Date(weekStartMs).toISOString()
+  const windowEnd = new Date(weekStartMs + WEEK_MS).toISOString()
 
   const [{ data: comps, error: compErr }, { data: tasks, error: taskErr }] = await Promise.all([
-    db.from('completions').select('member, at').gte('at', since),
+    db.from('completions').select('member, at').gte('at', windowStart).lt('at', windowEnd),
     db.from('tasks').select('owner'),
   ])
   if (compErr) return json({ error: compErr.message }, 500)
   if (taskErr) return json({ error: taskErr.message }, 500)
 
-  const completedLast7 = { Meg: 0, Leti: 0 }
+  const completedThisWeek = { Meg: 0, Leti: 0 }
   for (const c of (comps as CompletionRow[]) ?? []) {
-    if (c.member === 'Meg' || c.member === 'Leti') completedLast7[c.member]++
+    if (c.member === 'Meg' || c.member === 'Leti') completedThisWeek[c.member]++
   }
 
   const tasksByOwner = { Meg: 0, Leti: 0, Both: 0 }
@@ -54,8 +64,8 @@ Deno.serve(async (req) => {
   }
 
   const stats = {
-    week_start: mondayOf(now),
-    completed_last_7_days: completedLast7,
+    week_start: weekStart,
+    completed_this_week: completedThisWeek,
     tasks_assigned: tasksByOwner,
   }
 
